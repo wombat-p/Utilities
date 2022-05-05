@@ -91,87 +91,123 @@ cat("\n### Reading files ###\n")
 StatsPep <- read.csv("stand_pep_quant_merged.csv")
 StatsProt <- read.csv("stand_prot_quant_merged.csv")
 
-# Functionality
+#### Functionality
 Functionality = list()
-Traceability = list( 
-  FROM HERE
-    Spectra = list( 
-      TraceableSpectra=F,
-      UniversalSpectumIdentifiers=F,
-      PeptideToSpectra=F,
-      ProteinToSpectra=F
-    ),
-    FileNames = list(
-      ResultsToRawFiles=F,
-      PublicRawFiles=F
-    ),
-    Parameters=list(
-      Settings=F,
-      ExperimentalDesign=F
-    )
+### Traceability
+Traceability = list() 
+## Spectra
+Spectra = list() 
+
+# How do we check that? Would require looking into intermediate results files
+Spectra[["TraceableSpectra"]] <- F
+
+# Set to FALSE for now as determining them would be tricky
+Spectra[["UniversalSpectumIdentifiers"]] <- F
+
+# Check for corresponding columns and missing value in them
+id_cols <- grep("SpectraID|ScanNumber",colnames(StatsPep))
+Spectra[["PeptideToSpectra"]] <- ifelse(length(id_cols > 0), ifelse(any(rowSums(!is.na(StatsPep[, id_cols, drop=F])) == 0), F, T), F)
+
+id_cols <- grep("SpectraID|ScanNumber",colnames(StatsProt))
+Spectra[["ProteinToSpectra"]] <- ifelse(length(id_cols > 0), ifelse(any(rowSums(!is.na(StatsProt[, id_cols, drop=F])) == 0), F, T), F)
+
+Traceability[["Spectra"]] <- Spectra
+
+## FileNames
+FileNames = list()
+
+# TODO: check for sdrf or experimental design file
+FileNames[["ResultsToRawFiles"]] <- NA
+
+# URL available anywhere? TODO check for sdrf
+FileNames[["PublicRawFiles"]]  <- NA
+
+Traceability[["FileNames"]] <- FileNames
+
+## Parameters
+Parameters=list()
+
+# Check for settings in parameter file (yaml or sdrf): TODO: related to sdrf and/or yaml
+Parameters[["Settings"]] > NA
+
+# TODO Check for availability of non-default experimental design file (TODO standardize within workflows)
+Parameters[["ExperimentalDesign"]] <- F
+
+Traceability[["Parameters"]] <- Parameters
+Functionality[["Traceability"]] <- Traceability
+
+### Reproducibility
+Reproducibility <- list()
+
+## Files
+Files <- list()
+
+# Reproducible results. Has been run in a container? TODO check for call with docker or singularity
+Files[["Identify"]]  <- NA
+Reproducibility[["Files"]] <- Files
+
+### Performance
+Performance=list()
+
+##  Identification
+Identification <- list()
+# How many PSMs? TODO: needs columns (or only one) with PSM numbers
+Identification[["PSMNumber"]] <- NA
+
+PeptideNumber=NA,
+ProteinNumber=NA,
+ProteinGroupNumber=NA,
+PeptideCoverage=NA,
+ProteinCoverage=NA,
+PeptidesPerProtein=NA
+),
+Quantification=list(
+  CVPeptides=NA,
+  CVProteins=NA,
+  CorrelationPeptides=NA,
+  CorrelationProteins=NA,
+  NumberOfPeptides=NA,
+  NumberOfProteinGroups=NA,
+  DynamicPeptideRange=NA,
+  DynamicProteinRange=NA
+),
+GroundTruth=list(
+  FoldChangePrecision=NA,
+  AUCs=vector(),
+  FDRs5Perc=vector(),
+  FDRs1Perc=vector(),
+  ProteinLinearity=NA
+),
+Statistics=list(
+  DifferentialRegulatedPeptides5Perc=vector(),
+  DifferentialRegulatedProteins5Perc=vector(),
+  DifferentialRegulatedPeptides1Perc=vector(),
+  DifferentialRegulatedProteins1Perc=vector(),
+  MissingPeptideValues=NA,
+  MissingProteinValues=NA
+),
+Digestion=list(
+  Efficiency=vector()
+),
+PTMs=list(
+  PTMDistribution=vector(),
+  PTMOccupancy=vector()
+)
+),
+Parameter=list(
+  Identification=list(
+    DatabaseSize=NA,
+    CanonicalSequences=NA,
+    PTMLocalization=NA,
+    Parsimony=NA
   ),
-  Reproducibility=list(
-    Files=list(
-      Identify=NA
-    )
-  ),
-  Performance=list(
-    Identification=list(
-      PSMNumber=NA,
-      PeptideNumber=NA,
-      ProteinNumber=NA,
-      ProteinGroupNumber=NA,
-      PeptideCoverage=NA,
-      ProteinCoverage=NA,
-      PeptidesPerProtein=NA
-    ),
-    Quantification=list(
-      CVPeptides=NA,
-      CVProteins=NA,
-      CorrelationPeptides=NA,
-      CorrelationProteins=NA,
-      NumberOfPeptides=NA,
-      NumberOfProteinGroups=NA,
-      DynamicPeptideRange=NA,
-      DynamicProteinRange=NA
-    ),
-    GroundTruth=list(
-      FoldChangePrecision=NA,
-      AUCs=vector(),
-      FDRs5Perc=vector(),
-      FDRs1Perc=vector(),
-      ProteinLinearity=NA
-    ),
-    Statistics=list(
-      DifferentialRegulatedPeptides5Perc=vector(),
-      DifferentialRegulatedProteins5Perc=vector(),
-      DifferentialRegulatedPeptides1Perc=vector(),
-      DifferentialRegulatedProteins1Perc=vector(),
-      MissingPeptideValues=NA,
-      MissingProteinValues=NA
-    ),
-    Digestion=list(
-      Efficiency=vector()
-    ),
-    PTMs=list(
-      PTMDistribution=vector(),
-      PTMOccupancy=vector()
-    )
-  ),
-  Parameter=list(
-    Identification=list(
-      DatabaseSize=NA,
-      CanonicalSequences=NA,
-      PTMLocalization=NA,
-      Parsimony=NA
-    ),
-    Quantification=list(
-      Alignment=NA,
-      Imputation=NA,
-      Normalization=NA,
-      PeptideNumber=NA
-    )
+  Quantification=list(
+    Alignment=NA,
+    Imputation=NA,
+    Normalization=NA,
+    PeptideNumber=NA
   )
+)
 )
 #### Calculating peptide numbers
 globalBMs["numPeptides"] <- nrow(StatsPep)
