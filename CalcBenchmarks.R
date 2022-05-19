@@ -167,10 +167,10 @@ Performance[["Quantification"]] <- Quantification
 ## Statistics
 Statistics=list()
 # Calculate the average per comparison (columns)
-tstat <- StatsPep[,grep("^differential_abundance", colnames(StatsPep)), drop=F]
+tstat <- StatsPep[,grep("^differential_abundance_qvalue", colnames(StatsPep)), drop=F]
 Statistics[["DifferentialRegulatedPeptides5Perc"]]  <- colSums(tstat < 0.05, na.rm=T) / ncol(tstat)
 Statistics[["DifferentialRegulatedPeptides1Perc"]]  <- colSums(tstat < 0.01, na.rm=T) / ncol(tstat)
-tstat <- StatsProt[,grep("^differential_abundance", colnames(StatsProt)), drop=F]
+tstat <- StatsProt[,grep("^differential_abundance_qvalue", colnames(StatsProt)), drop=F]
 Statistics[["DifferentialRegulatedProteins5Perc"]]  <- colSums(tstat < 0.05, na.rm=T) / ncol(tstat)
 Statistics[["DifferentialRegulatedProteins1Perc"]]  <- colSums(tstat < 0.01, na.rm=T) / ncol(tstat)
 # Percentages in full data
