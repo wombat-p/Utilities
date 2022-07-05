@@ -3,7 +3,7 @@
 import pandas as pd
 
 
-expd = pd.read_csv("exp_design_in.txt", sep='\t')
+expd = pd.read_csv("exp_design.txt", sep='\t')
 expd.columns = map(str.lower, expd.columns)  # convert column names to lower-case
 sdrf_out = expd
 sdrf_out.columns = ['comment[file uri]', 'characteristics[experimental samples]']

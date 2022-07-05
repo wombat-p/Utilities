@@ -29,9 +29,9 @@ out_yaml = dict()
    
 ## WE NEED AN SDRF FILE FOR THE EXPERIMENTAL DESIGN, CONTAINING FILE LOCATIONS
 sdrf_content = pd.DataFrame()
-has_sdrf = os.path.isfile("./sdrf.tsv")
+has_sdrf = os.path.isfile("./sdrf_local.tsv")
 if has_sdrf :
-   sdrf_content = pd.read_csv("sdrf.tsv", sep="\t")
+   sdrf_content = pd.read_csv("sdrf_local.tsv", sep="\t")
    mod_columns = sdrf_content.filter(like="comment[modification parameters]")
    sdrf_content = sdrf_content.drop(columns=mod_columns.columns)
 else:
@@ -77,9 +77,7 @@ for p in mapping:
 
      # Mass tolerances: do they include Da or ppm exclusively?
      if pname == "fragment_mass_tolerance" or pname == "precursor_mass_tolerance":
-        print(pvalue)
         unit = pvalue.split(" ")[1]
-        pvalue = pvalue.split(" ")[0]
         if unit != "Da" and unit != "ppm" :
           exit("ERROR: " + pname + " allows only units of \"Da\" and \"ppm\", separated by space from the value!!\nWe found " + unit)
 
