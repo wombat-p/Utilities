@@ -102,11 +102,11 @@ Identification[["ProteinGroupNumber"]] <- nrow(StatsProt)
 
 # percentage of peptides identified in all samples
 all_pep_samples <- grep("^abundance_", colnames(StatsPep))
-Identification[["PeptideCoverage"]] <- sum(rowSums(is.na(StatsPep[,all_pep_samples,drop=F])) == 0)
+Identification[["PeptideCoverage"]] <- sum(rowSums(is.na(StatsPep[,all_pep_samples,drop=F])) == 0) / nrow(StatsPep)
 
 # precentage of proteins identified in all samples
 all_prot_samples <- grep("^abundance_", colnames(StatsProt))
-Identification[["ProteinCoverage"]] <- sum(rowSums(is.na(StatsProt[,all_prot_samples,drop=F])) == 0)
+Identification[["ProteinCoverage"]] <- sum(rowSums(is.na(StatsProt[,all_prot_samples,drop=F])) == 0) / nrow(StatsProt)
 
 # distribution of peptides per protein group (only 1-10)
 tab <- table(unlist(StatsProt[,grep("^number_of_peptides_", colnames(StatsProt)),drop=F]))
@@ -119,7 +119,7 @@ Quantification=list()
 
 # CV and correlation of peptides within replicates
 tPep <- tProt <- tPep2 <- tProt2 <-tprotquant <- tpepquant <-  NULL
-for (i in unique(ExpDesign$exp_condition)) {
+for (i in make.names(unique(ExpDesign$exp_condition))) {
   tquant <- as.matrix(StatsPep[,grep(paste0("^abundance_", i), colnames(StatsPep)), drop=F])
   tPep <- c(tPep, rowSds(tquant, na.rm=T) / rowMeans(tquant, na.rm=T))
   tPep2 <- c(tPep2, cor(log2(tquant), use="pairwise.complete.obs"))
@@ -167,10 +167,10 @@ Performance[["Quantification"]] <- Quantification
 ## Statistics
 Statistics=list()
 # Calculate the average per comparison (columns)
-tstat <- StatsPep[,grep("^differential_regulation_", colnames(StatsPep)), drop=F]
+tstat <- StatsPep[,grep("^differential_abundance_qvalue", colnames(StatsPep)), drop=F]
 Statistics[["DifferentialRegulatedPeptides5Perc"]]  <- colSums(tstat < 0.05, na.rm=T) / ncol(tstat)
 Statistics[["DifferentialRegulatedPeptides1Perc"]]  <- colSums(tstat < 0.01, na.rm=T) / ncol(tstat)
-tstat <- StatsProt[,grep("^differential_regulation_", colnames(StatsProt)), drop=F]
+tstat <- StatsProt[,grep("^differential_abundance_qvalue", colnames(StatsProt)), drop=F]
 Statistics[["DifferentialRegulatedProteins5Perc"]]  <- colSums(tstat < 0.05, na.rm=T) / ncol(tstat)
 Statistics[["DifferentialRegulatedProteins1Perc"]]  <- colSums(tstat < 0.01, na.rm=T) / ncol(tstat)
 # Percentages in full data
@@ -186,7 +186,7 @@ Performance[["Digestion"]] <- Digestion
 ## PTMs
 PTMs=list()
 # percentages of different PTMs
-mods <- str_extract_all( StatsPep$modified_peptide, "\\[[0-9,\\.]*\\]|\\([a-z,A-Z]*\\)|\\<[a-z,A-Z]*\\>")
+mods <- str_extract_all( StatsPep$modified_peptide, "\\[[a-z,A-Z,0-9,\\.]*\\]|\\([a-z,A-Z]*\\)|\\<[a-z,A-Z]*\\>")
 PTMs[["PTMDistribution"]] <- as.data.frame(table(unlist(mods)))
 # How many PTMs per peptide
 PTMs[["PTMOccupancy"]] <- as.data.frame(table(sapply(mods, length)))
