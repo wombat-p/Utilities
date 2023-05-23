@@ -1,0 +1,37 @@
+Software_name	Step_name	optimal_task_name_final
+TPP	RAW2MZML	peaklist_creation
+TPP	WRITE_CONFIG	workflow_configuration
+TPP	RUN_COMET	MSMS_search
+TPP	PEPTIDEPROPHET	MSMS_search_validation
+TPP	PROTEINPROPHET	MSMS_search_validation
+TPP	STPETER	quantification
+TPP	MERGEOUTPUT	statistical_testing
+TPP	ROTS	statistical_testing
+TPP	PROTXML2CSV	writing_tables
+COMPOMICS	RAW2MZML	peaklist_creation
+COMPOMICS	CREATE_DECOY_DATABASE	MSMS_search
+COMPOMICS	PREPARE_SEARCHGUI	workflow_configuration
+COMPOMICS	RUN_SEARCHGUI	MSMS_search
+COMPOMICS	RUN_PEPTIDESHAKER	MSMS_search_validation
+COMPOMICS	PEPTIDESHAKER_REPORT	writing_tables
+COMPOMICS	FLASHLFQ	quantification
+COMPOMICS	MSQROB	statistical_testing
+MAXQUANT	CONVERT_MAXQUANT	workflow_configuration
+MAXQUANT	MAXQUANT_LFQ	peaklist_creation + MSMS_search + MSMS_search_validation + quantification
+MAXQUANT	NORMALYZERDE	peaklist_creation + MSMS_search + MSMS_search_validation + quantification
+PROLINE	RAW2MZDB	peaklist_creation
+PROLINE	MZDB2MGF	peaklist_creation
+PROLINE	EXP_DESIGN_PROLINE	workflow_configuration
+PROLINE	CREATE_DECOY_DATABASE	MSMS_search
+PROLINE	PREPARE_SEARCHGUI	workflow_configuration
+PROLINE	RUN_SEARCHGUI	MSMS_search
+PROLINE	CONFIG_PROLINE	workflow_configuration
+PROLINE	RUN_PROLINE	quantification
+PROLINE	POLYSTEST	statistical_testing
+PROLINE	CONVERT_POLYSTEST	statistical_testing
+CALCBENCHMARKS_MQ	OTHER	benchmark
+CALCBENCHMARKS_PROLINE	OTHER	benchmark
+CALCBENCHMARKS_COMPOMICS	OTHER	benchmark
+CALCBENCHMARKS_TPP	OTHER	benchmark
+PREPARE_FILES	OTHER	wombatp_prep
+SDRFMERGE	OTHER	wombatp_prep
