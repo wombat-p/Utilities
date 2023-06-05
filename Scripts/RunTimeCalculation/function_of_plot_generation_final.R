@@ -248,12 +248,12 @@ create_exe_trace_output <- function(file_path,
   
   
   ### TO CREATE SEPARATE OBJECT of EACH TASK NAME
-
+  
   submit_summation <- merge_with_conv_min_gb %>% 
-  filter(task_name %in% "submit") %>%
-  filter(!grepl("CALCBENC|PREP|SDRF",Software_name.x)) %>%
-  group_by(optimal_task_name_final,Software_name.x) %>% 
-  summarise(sum(as.numeric(combine_values)))
+    filter(task_name %in% "submit") %>%
+    filter(!grepl("CALCBENC|PREP|SDRF",Software_name.x)) %>%
+    group_by(optimal_task_name_final,Software_name.x) %>% 
+    summarise(sum(as.numeric(combine_values)))
   
   
   merge_with_conv <- merge_with_conv_min_gb %>% 
@@ -264,12 +264,12 @@ create_exe_trace_output <- function(file_path,
     summarise(values=sum(as.numeric(combine_values)))
   
   ###### DURATION CALCULATION BY INVOLVING MAXQUANT ADDITIONAL FILE ######
-   # Remove summation info of Maxquant
+  # Remove summation info of Maxquant
   submit_summation_rmv_mq <- submit_summation %>% filter(!grepl("MAXQUANT",Software_name.x))
   
   ###### DURATION CALCULATION BY INVOLVING MAXQUANT ADDITIONAL FILE ######
   
-   # Read additional file for merging
+  # Read additional file for merging
   mq_run_time <- read.delim(paste0(running_times_path,running_times_file_name),
                             header=TRUE,
                             sep = "\t")
@@ -326,11 +326,11 @@ create_exe_trace_output <- function(file_path,
                       "Estimating complexity ")
   
   MSMS_search_validation <- c("Filter identifications (MS/MS) ",
-                           "Calculating PEP ",
-                           "Copying identifications ",
-                           "Applying FDR ",
-                           "Filtering identifications (SP) ",
-                           "Applying FDR (SP) ")
+                              "Calculating PEP ",
+                              "Copying identifications ",
+                              "Applying FDR ",
+                              "Filtering identifications (SP) ",
+                              "Applying FDR (SP) ")
   
   writing_tables <- c("Testing raw files ",
                       "Writing tables ",
@@ -367,7 +367,7 @@ create_exe_trace_output <- function(file_path,
   submit_summation_add_mq <- rbind(submit_summation_rmv_mq,mq_run_time_classed)
   
   colnames(submit_summation_add_mq)[3] <- "values"
-    
+  
   order_x_axis_label_duration <- c("workflow_configuration",
                                    "wombatp_prep",
                                    "peaklist_creation",
@@ -391,20 +391,20 @@ create_exe_trace_output <- function(file_path,
                             ymax) {
     
     ggplot(data ={{data}}, aes(y={{y}}, x=factor({{x}}, levels = order_x_axis_label),fill={{fill}})) + 
-      geom_bar(width= .5,stat = "identity", position = position_dodge2(preserve = "single",width = 0.7))  +  
+geom_bar(stat = "identity", position = position_dodge2(preserve = "single", padding=0.01))  +  
       theme_light() + coord_flip() +
-      theme(legend.text = element_text(size=15), #plot.margin=unit(c(-0.5,1,1,1), "cm"),
+      theme(legend.text = element_text(size=25), #plot.margin=unit(c(-0.5,1,1,1), "cm"),
             axis.title.x = element_text(size = 15),
             axis.title.y = element_text(size = 15),
-            plot.title = element_text(size=20),
-            legend.title=element_text(size=15),
+            plot.title = element_text(size=17.5),
+            legend.title=element_text(size=25),
             axis.text.x =element_text(size=15,angle = 90),
             axis.text.y = element_text(size = 15),
             axis.title=element_text(size=15)
       ) + scale_y_continuous(breaks = seq(from= 0,to= ymax,by=inc)) +
       ggtitle(title_name) +
       labs(fill="Wombat pipeline steps",x= "Task Name", y= ylabel) +
-      scale_fill_viridis(discrete = T, option = "C") +
+      scale_fill_brewer(type="seq", palette = "Set1") +
       scale_x_discrete(limits = levels(order_x_axis_label),
                        labels = function(order_x_axis_label) str_wrap(order_x_axis_label, width = 10))
     
@@ -414,29 +414,29 @@ create_exe_trace_output <- function(file_path,
   
   # THIS IS FOR DURATION: THIS IS THE ONLY ONE THAT USE DIFFERENT X AXIS LABELS
   assign(paste0("submit_p"),final_barplot(data = submit_summation_add_mq %>% 
-                  filter(!grepl("CALCBENC|PREP|SDRF",Software_name.x)) %>%
-                  filter(!grepl("workflow_configuration|other", optimal_task_name_final)),
-                x=optimal_task_name_final,
-                y=values,
-                order_x_axis_label= order_x_axis_label_duration,
-                fill=Software_name.x,
-                title_name = "Total of running time across all MS/MS softwares",
-                inc = 20,
-                ylabel = "Running Time (min)",
-                ymax = max(submit_summation_add_mq$values)
-                ))
+                                            filter(!grepl("CALCBENC|PREP|SDRF",Software_name.x)) %>%
+                                            filter(!grepl("workflow_configuration|other", optimal_task_name_final)),
+                                          x=optimal_task_name_final,
+                                          y=values,
+                                          order_x_axis_label= order_x_axis_label_duration,
+                                          fill=Software_name.x,
+                                      title_name = "Running time of different analysis steps",
+                                          inc = 20,
+                                          ylabel = "Running Time (min)",
+                                          ymax = max(submit_summation_add_mq$values)
+  ))
   
-
+  
   
   assign(paste0("rest_p"),final_barplot(data = merge_with_conv,
-                                                   x=merge_with_conv$task_name,
-                                                   y=merge_with_conv$values,
-                                                   order_x_axis_label= unique(merge_with_conv$task_name),
-                                                   fill=merge_with_conv$Software_name.x,
-                                                   title_name = "Summation of all task names except running time across all MS/MS softwares",
-                                                   inc = 100,
-                                                   ylabel = " ",
-                                                   ymax = max(merge_with_conv$values)
+                                        x=merge_with_conv$task_name,
+                                        y=merge_with_conv$values,
+                                        order_x_axis_label= unique(merge_with_conv$task_name),
+                                        fill=merge_with_conv$Software_name.x,
+                                    title_name = "Summation of all task names except running time across all MS/MS softwares",
+                                        inc = 100,
+                                        ylabel = " ",
+                                        ymax = max(merge_with_conv$values)
   ))
   
   
@@ -449,15 +449,15 @@ create_exe_trace_output <- function(file_path,
                "rchar usage (GB)",
                "wchar usage (GB)"
   )
-
+  
   ### WITHOUT DURATION ###
   title_names <- c( "number of real memory peaks",
                     "percentage of used CPUs",
                     "number of GBs the process read",
                     "number of GBs the process write"
   )
-  final_title_names <- as.data.frame(sapply(title_names,function(x) paste("Total",x,"across all MS/MS softwares")))
-
+final_title_names <- as.data.frame(sapply(title_names,function(x) paste("Total of",x)))
+  
   report_calc <- c("submit","peak_rss","cpu","rchar","wchar")
   report_calc_wo_submit <- report_calc[-1]
   
@@ -494,29 +494,31 @@ create_exe_trace_output <- function(file_path,
     }
   }
   
-  sapply(report_calc,function(x) ggsave(filename = paste0(x,"_p",".tiff"),
-                                        width = 50, height = 40, 
+  sapply(report_calc,function(x) ggsave(filename = paste0(x,"_p",".pdf"),
+                                        #                                        width = 50, height = 40, 
                                         path = output_path,
                                         units = "cm",
                                         get(paste0(x,"_p")),
-                                        device = "tiff", #".svg"
+                                        device = "pdf", #".svg"
   ))
   
   # MERGE ALL FIGURES INTO ONE
-  gg_all <- ggpubr::ggarrange(get(paste0(report_calc[1],"_p")),
-                              get(paste0(report_calc[2],"_p")),
-                              get(paste0(report_calc[3],"_p")),
-                              get(paste0(report_calc[4],"_p")),
-                              get(paste0(report_calc[5],"_p")),
-                              ncol = 1,
-                              common.legend = TRUE)
+  library(ggpubr)
+  gg_all <- ggarrange(ggarrange(get(paste0(report_calc[1],"_p")), heights=2,
+                                common.legend=T),
+                      ggarrange(get(paste0(report_calc[2],"_p")),
+                                get(paste0(report_calc[3],"_p")),
+                                get(paste0(report_calc[4],"_p")),
+                                get(paste0(report_calc[5],"_p")),
+                              common.legend=T),
+                      common.legend = TRUE)
   
-  ggsave(filename = paste("combined",".tiff",sep = "_"),
-         width = 100, height = 80, 
+  ggsave(filename = paste("combined",".pdf",sep = "_"),
+     width = 60, height = 40, 
          path =  output_path,
          units = "cm",
          gg_all,
-         device = "tiff", #".svg"
+         device = "pdf", #".svg"
   )
   
 }
