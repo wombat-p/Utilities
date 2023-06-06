@@ -16,14 +16,15 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 workflows <- c("compomics","maxquant","proline", "tpp")
 
-folder <- "PXD020394/"
+folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD020394/dev/"
 results <- list()
 allnames <- NULL
 
 ### pdf file?
 # pdf(paste0(folder, "_plots.pdf"), width=10)
 
-ups <- read.csv("ups_prots.csv")[,2]
+ups <- NULL
+try(ups <- read.csv("../ups_prots.csv")[,2])
 
 for (w in workflows) {
 r <- unlist(read_yaml(paste0(folder,"/benchmarks_",w,".json")))
@@ -66,25 +67,47 @@ barplot(as.matrix(peps_per_prot), names.arg = 1:ncol(peps_per_prot), legend.text
 # barplot(as.numeric(benchmatrix$Functionality.Performance.Quantification.CorrelationProteins), names.arg = workflows, main="Correlation between protein quant")
 # barplot(as.numeric(benchmatrix$Functionality.Performance.Quantification.CorrelationPeptides), names.arg = workflows, main="Correlation between peptide quant")
 
+## Create a lollipop chart
+# colors
+c_workflows <- brewer.pal(4, "Set1")
 
-# trying slope graphs
-sel <- c("Functionality.Performance.Identification.PeptideNumber", "Functionality.Performance.Identification.ProteinNumber", 
-   "Functionality.Performance.Identification.ProteinGroupNumber")
+sel <- c("Functionality.Performance.Identification.PeptideNumber", "Functionality.Performance.Identification.ProteinNumber") 
+#       "Functionality.Performance.Identification.ProteinGroupNumber")
 tttb <- melt(t(benchmatrix))
 colnames(tttb) <- c("Metric", "Workflow", "value")
 tttb$value <- as.numeric(tttb$value)
 tttb <- tttb[!is.na(tttb$value),]
 ttt <- tttb[tttb$Metric %in% sel, ]
 ttt$Metric <- gsub("[A-Z,a-z]*\\.","", ttt$Metric)
-g1 <- newggslopegraph(ttt, Workflow, value, Metric, RemoveMissing=T, Title = "A) Identification depth", 
-                DataLabelPadding = 0.2, WiderLabels = T,
-                SubTitle = "", Caption = "") + ylim(-1000, max(ttt$value)) + geom_hline(yintercept = c(0))
+g1 <- ggplot(ttt, aes(x = Workflow, y = value, color = Metric)) +
+# Add segments from the baseline to the value
+geom_segment(aes(xend = Workflow, yend = 0), size = 1,
+             position = position_dodge(width = 0.5)) +
+# Add points at the value
+geom_point(size = 5,  position = position_dodge(width = 0.5)) +
+# Add labels for the value
+geom_text(aes(label = round(value, 0)), size=3, hjust = rep(c(1.5, -0.5), 4), 
+        position = position_dodge(width = 0.5)) +
+# Add titles and caption
+labs(title = "A) Identification depth",
+subtitle = "Fraction identified in all samples",
+     caption = "") +
+# Remove the legend title
+theme(legend.title = element_blank()) +
+# Specify the colors and labels for the color aesthetic
+scale_color_manual(values = c("PeptideNumber" = "#1f77b4", "ProteinNumber" = "#ff7f0e", "ProteinGroupNumber" = "#2ca02c"),
+                   labels = c("PeptideNumber" = "Peptide Number", "ProteinNumber" = "Protein Number", "ProteinGroupNumber" = "Protein Group Number")) +
+# Rotate the x labels 90 degrees
+theme(axis.text.x = element_text(colour=c_workflows, size = 10, vjust = 0.7, angle = 0,  face = "bold"))
+# g1 <- newggslopegraph(ttt, Workflow, value, Metric, RemoveMissing=T, Title = "A) Identification depth", 
+#               DataLabelPadding = 0.2, WiderLabels = T,
+#               SubTitle = "", Caption = "") + ylim(-1000, max(ttt$value)) + geom_hline(yintercept = c(0))
 
 sel <- c("Functionality.Performance.Identification.ProteinCoverage", "Functionality.Performance.Identification.PeptideCoverage")
 ttt <- tttb[tttb$Metric %in% sel, ]
 ttt$Metric <- gsub("[A-Z,a-z]*\\.","", ttt$Metric)
 g2 <- newggslopegraph(ttt, Workflow, value, Metric, RemoveMissing=T, Title = "B) Coverage", WiderLabels = T, 
-                SubTitle = "Fraction identified in all samples", Caption = "") + 
+            SubTitle = "Fraction identified in all samples", Caption = "") + 
 ylim(0,1) + geom_hline(yintercept = c(0,1))
 
 sel <- c("Functionality.Performance.Quantification.CVPeptides", "Functionality.Performance.Quantification.CVProteins", 
