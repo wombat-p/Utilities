@@ -17,7 +17,7 @@ library(org.Hs.eg.db)
 library(ReactomePA)
 
 # Set folder for data set
- folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD020394/dev/"
+folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD020394/dev/"
 # folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD009815/0.9.2/"
 #folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD005507/0.9.2/"
 #folder <- "~/devel/Bioinformatics/ELIXIR_EDAM/WOMBAT-P/WOMBAT-P_Processed/PXD009203/0.9.2/"
@@ -176,15 +176,15 @@ sample_types <- gsub("X|CT_mixture_QY_|_CN_UPS1_CV_Standards_Research_Group", ""
 if(all(grepl("(amol)|(fmol)", sample_types))) {
   n_sample_types <- paste0("abundance_", c(paste0(c(10, 50, 100, 250, 500), "_amol"),
                                            paste0(c(1, 5, 10, 25, 50), "_fmol")))
-  c_sample_types <- n_sample_types
   names(c_sample_types) <- n_sample_types
+  c_sample_types <- c_sample_types[sample_types]
 } else {
-  c_sample_types <- as.factor(sample_types)
+  c_sample_types <- c_sample_types[as.factor(sample_types)]
   n_sample_types <- unique(sort(sample_types))
 }
 
 # Define sample type and workflow colors
-c_sample_types <- colorpanel(length(unique(sample_types)), "#115f9a", "#76c68f", "#d0f400")[c_sample_types]
+c_sample_types <- colorpanel(length(unique(sample_types)), "#115f9a", "#76c68f", "#d0f400")
 workflow_types <- str_extract( col_classes, paste(workflows, collapse="|"))
 c_workflow_types <- brewer.pal(4, "Set1")[as.factor(workflow_types)]
 
