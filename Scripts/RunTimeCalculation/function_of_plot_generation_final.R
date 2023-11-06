@@ -1,4 +1,4 @@
-#
+
 library(dplyr)
 library(neonUtilities)
 library(stringr)
@@ -393,17 +393,17 @@ create_exe_trace_output <- function(file_path,
     ggplot(data ={{data}}, aes(y={{y}}, x=factor({{x}}, levels = order_x_axis_label),fill={{fill}})) + 
 geom_bar(stat = "identity", position = position_dodge2(preserve = "single", padding=0.01))  +  
       theme_light() + coord_flip() +
-      theme(legend.text = element_text(size=25), #plot.margin=unit(c(-0.5,1,1,1), "cm"),
+      theme(legend.text = element_text(size=15), #plot.margin=unit(c(-0.5,1,1,1), "cm"),
             axis.title.x = element_text(size = 15),
             axis.title.y = element_text(size = 15),
-            plot.title = element_text(size=17.5),
-            legend.title=element_text(size=25),
+            plot.title = element_text(size=15),
+            legend.title=element_text(size=15),
             axis.text.x =element_text(size=15,angle = 90),
-            axis.text.y = element_text(size = 15),
+            axis.text.y = element_text(size = 15, angle = 0, vjust=0.5),
             axis.title=element_text(size=15)
-      ) + scale_y_continuous(breaks = seq(from= 0,to= ymax,by=inc)) +
+      )  + # scale_y_continuous(breaks = seq(from= 0,to= ymax,by=inc)) +
       ggtitle(title_name) +
-      labs(fill="Wombat pipeline steps",x= "Task Name", y= ylabel) +
+      labs(fill="Wombat pipeline steps",x= "", y= ylabel) +
       scale_fill_brewer(type="seq", palette = "Set1") +
       scale_x_discrete(limits = levels(order_x_axis_label),
                        labels = function(order_x_axis_label) str_wrap(order_x_axis_label, width = 10))
@@ -420,7 +420,7 @@ geom_bar(stat = "identity", position = position_dodge2(preserve = "single", padd
                                           y=values,
                                           order_x_axis_label= order_x_axis_label_duration,
                                           fill=Software_name.x,
-                                      title_name = "Running time of different analysis steps",
+                                      title_name = "Running time of different steps",
                                           inc = 20,
                                           ylabel = "Running Time (min)",
                                           ymax = max(submit_summation_add_mq$values)
@@ -444,17 +444,17 @@ geom_bar(stat = "identity", position = position_dodge2(preserve = "single", padd
   ### REST IS CREATED INSIDE FOR LOOP ### 
   
   # ### WITHOUT DURATION ###
-  ylabels <- c("peak rss (GB)",
-               "percentage of cpu",
-               "rchar usage (GB)",
-               "wchar usage (GB)"
+  ylabels <- c("GB",
+               "%",
+               "GB",
+               "GB"
   )
   
   ### WITHOUT DURATION ###
-  title_names <- c( "number of real memory peaks",
-                    "percentage of used CPUs",
-                    "number of GBs the process read",
-                    "number of GBs the process write"
+  title_names <- c( "real memory peaks",
+                    "Used CPUs (%)",
+                    "GBs read",
+                    "GBs write"
   )
 final_title_names <- as.data.frame(sapply(title_names,function(x) paste("Total of",x)))
   
@@ -514,7 +514,7 @@ final_title_names <- as.data.frame(sapply(title_names,function(x) paste("Total o
                       common.legend = TRUE)
   
   ggsave(filename = paste("combined",".pdf",sep = "_"),
-     width = 60, height = 40, 
+     width = 30, height = 20, 
          path =  output_path,
          units = "cm",
          gg_all,
